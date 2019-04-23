@@ -4,6 +4,7 @@ import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.repository.CategoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,8 +18,20 @@ public class CategoriaService {
         this.categoriaRepository = categoriaRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<Categoria> todas() {
-
         return categoriaRepository.findAll();
+    }
+
+    @Transactional
+    public Categoria salva(Categoria categoria) {
+        return categoriaRepository.save(categoria );
+
+    }
+
+    @Transactional(readOnly = true)
+    public Categoria buscaPor(Integer id) {
+        return categoriaRepository.findById(id).get();
+
     }
 }

@@ -22,20 +22,4 @@ public class VendasApiApplication {
     }
 
 
-    @Bean
-    public CommandLineRunner commandLineRunner() {
-
-
-        return args -> {
-
-            List<Categoria> categorias = Arrays.asList(new Categoria("Informática"),
-                                                       new Categoria("Eletrônica") );
-
-
-            categoriaRepository.saveAll(categorias );
-
-
-        };
-    }
-
 }
