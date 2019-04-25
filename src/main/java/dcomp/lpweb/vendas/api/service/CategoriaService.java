@@ -2,6 +2,7 @@ package dcomp.lpweb.vendas.api.service;
 
 import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.repository.CategoriaRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ public class CategoriaService {
 
     @Autowired
     public CategoriaService(CategoriaRepository categoriaRepository) {
+
         this.categoriaRepository = categoriaRepository;
     }
 
@@ -33,5 +35,19 @@ public class CategoriaService {
     public Categoria buscaPor(Integer id) {
         return categoriaRepository.findById(id).get();
 
+    }
+
+    @Transactional
+    public void excluiPor(Integer id) {
+        categoriaRepository.deleteById(id );
+    }
+
+    @Transactional
+    public Categoria atualiza(Integer id, Categoria categoria) {
+
+        Categoria categoriaSalva = this.buscaPor(id);
+        BeanUtils.copyProperties(categoria, categoriaSalva, "id");
+
+        return  categoriaSalva;
     }
 }

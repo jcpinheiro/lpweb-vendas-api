@@ -3,6 +3,7 @@ package dcomp.lpweb.vendas.api.controller;
 import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.service.CategoriaService;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,18 @@ public class CategoriaController {
     @GetMapping("/{id}")
     public Categoria buscaPor(@PathVariable Integer id) {
         return categoriaService.buscaPor(id );
+    }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void exclui(@PathVariable Integer id) {
+        categoriaService.excluiPor(id );
+    }
+
+
+    @PutMapping("/{id}")
+    public Categoria altera(@PathVariable  Integer id, @RequestBody Categoria categoria) {
+       return  categoriaService.atualiza(id, categoria );
     }
 
 }
