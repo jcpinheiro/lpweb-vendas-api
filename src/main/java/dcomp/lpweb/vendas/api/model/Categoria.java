@@ -1,7 +1,11 @@
 package dcomp.lpweb.vendas.api.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -12,6 +16,10 @@ public class Categoria {
     private Integer id;
 
     private String nome;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "categorias")
+    private final List<Produto> produtos = new ArrayList<>();
 
 
     public Categoria() {}
@@ -36,6 +44,10 @@ public class Categoria {
         this.nome = nome;
     }
 
+
+    public List<Produto> getProdutos() {
+        return produtos;
+    }
 
     @Override
     public boolean equals(Object o) {
