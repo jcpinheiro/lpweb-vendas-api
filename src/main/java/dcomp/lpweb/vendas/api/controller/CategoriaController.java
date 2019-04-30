@@ -6,8 +6,12 @@ import dcomp.lpweb.vendas.api.service.CategoriaService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletResponse;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,9 +34,17 @@ public class CategoriaController {
 
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Categoria salva(@RequestBody Categoria categoria) {
-        return categoriaService.salva(categoria );
+    public ResponseEntity<Categoria> salva(@RequestBody Categoria categoria ) {
+
+        Categoria categoriaSalva = categoriaService.salva(categoria);
+
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequestUri()
+                .path("/{id}")
+                .buildAndExpand(categoriaSalva.getId())
+                .toUri();
+
+        return ResponseEntity.created(uri).body(categoriaSalva);
     }
 
     @GetMapping("/{id}")
