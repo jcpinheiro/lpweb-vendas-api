@@ -1,5 +1,6 @@
 package dcomp.lpweb.vendas.api.controller;
 
+import dcomp.lpweb.vendas.api.controller.dto.CategoriaDTO;
 import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.service.CategoriaService;
 
@@ -34,9 +35,12 @@ public class CategoriaController {
 
 
     @PostMapping
-    public ResponseEntity<Categoria> salva(@RequestBody Categoria categoria ) {
+    public ResponseEntity<CategoriaDTO> salva(@RequestBody CategoriaDTO categoriaDTO ) {
 
-        Categoria categoriaSalva = categoriaService.salva(categoria);
+        Categoria categoria = new Categoria();
+        BeanUtils.copyProperties(categoriaDTO, categoria);
+
+        Categoria categoriaSalva = categoriaService.salva(categoria );
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -44,7 +48,9 @@ public class CategoriaController {
                 .buildAndExpand(categoriaSalva.getId())
                 .toUri();
 
-        return ResponseEntity.created(uri).body(categoriaSalva);
+        BeanUtils.copyProperties(categoriaSalva, categoriaDTO );
+
+        return ResponseEntity.created(uri).body(categoriaDTO);
     }
 
     @GetMapping("/{id}")

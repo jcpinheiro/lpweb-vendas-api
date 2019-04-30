@@ -4,6 +4,7 @@ package dcomp.lpweb.vendas.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +17,16 @@ public class Categoria {
     private Integer id;
 
     private String nome;
+
+    private String descricao;
+
+    @Column(name = "momento_criacao")
+    private LocalDateTime momentoCriacao;
+
+    @PrePersist
+    private void persist() {
+        this.momentoCriacao = LocalDateTime.now();
+    }
 
     @JsonIgnore
     @ManyToMany(mappedBy = "categorias")
@@ -60,5 +71,17 @@ public class Categoria {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public LocalDateTime getMomentoCriacao() {
+        return momentoCriacao;
     }
 }
