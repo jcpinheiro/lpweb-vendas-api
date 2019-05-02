@@ -4,15 +4,19 @@ import dcomp.lpweb.vendas.api.controller.dto.CategoriaDTO;
 import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.service.CategoriaService;
 
+import dcomp.lpweb.vendas.api.util.PropriedadesUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,8 +33,19 @@ public class CategoriaController {
 
 
     @GetMapping
-    public List<Categoria> todas() {
-        return categoriaService.todas();
+    public List<CategoriaDTO> todas() {
+
+        List<Categoria> categorias = categoriaService.todas();
+
+        List<CategoriaDTO> categoriasDTO = new ArrayList<>(categorias.size() );
+
+        categorias.forEach(categoria -> {
+                                  CategoriaDTO categoriaDTO = new CategoriaDTO();
+                                  BeanUtils.copyProperties(categoria, categoriaDTO);
+                                  categoriasDTO.add(categoriaDTO );
+                           });
+
+        return categoriasDTO;
     }
 
 
@@ -54,8 +69,14 @@ public class CategoriaController {
     }
 
     @GetMapping("/{id}")
-    public Categoria buscaPor(@PathVariable Integer id) {
-        return categoriaService.buscaPor(id );
+    public CategoriaDTO buscaPor(@PathVariable Integer id) {
+
+        Categoria categoria = categoriaService.buscaPor(id);
+        CategoriaDTO categoriaDTO = new CategoriaDTO();
+
+        BeanUtils.copyProperties(categoria, categoriaDTO);
+
+        return categoriaDTO;
     }
 
     @DeleteMapping("/{id}")
@@ -66,8 +87,19 @@ public class CategoriaController {
 
 
     @PutMapping("/{id}")
-    public Categoria altera(@PathVariable  Integer id, @RequestBody Categoria categoria) {
-       return  categoriaService.atualiza(id, categoria );
+    public CategoriaDTO altera(@PathVariable  Integer id, @RequestBody CategoriaDTO categoriaDTO) {
+
+
+        Categoria categoria = categoriaService.buscaPor(id );
+
+        BeanUtils.copyProperties(categoriaDTO,
+                categoria,
+                PropriedadesUtil.obterPropriedadesComNullDe(categoriaDTO) );
+
+        Categoria categoriaAtualizada = categoriaService.atualiza(id, categoria);
+        BeanUtils.copyProperties(categoriaAtualizada, categoriaDTO );
+
+        return categoriaDTO;
     }
 
 }
