@@ -6,7 +6,7 @@ import java.util.List;
 public class Resposta<T> {
 
     private T dados;
-    private List<String> erros = new ArrayList<>();
+    private List<Erro> erros = new ArrayList<>();
 
 
     public T getDados() {
@@ -17,11 +17,11 @@ public class Resposta<T> {
         this.dados = dados;
     }
 
-    public List<String> getErros() {
+    public List<Erro> getErros() {
         return erros;
     }
 
-    public void setErros(List<String> erros) {
+    public void setErros(List<Erro> erros) {
         this.erros = erros;
     }
 }

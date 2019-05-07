@@ -4,12 +4,15 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class CategoriaDTO {
 
     private Integer id;
+
+    @NotNull
     private String nome;
 
     private String descricao;

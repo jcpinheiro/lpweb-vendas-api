@@ -54,7 +54,7 @@ public class CategoriaController {
 
 
     @PostMapping
-    public ResponseEntity<Resposta<CategoriaDTO>> salva(@RequestBody CategoriaDTO categoriaDTO ) {
+    public ResponseEntity<Resposta<CategoriaDTO>> salva(@Valid @RequestBody CategoriaDTO categoriaDTO ) {
 
         Categoria categoria = new Categoria();
         BeanUtils.copyProperties(categoriaDTO, categoria);
