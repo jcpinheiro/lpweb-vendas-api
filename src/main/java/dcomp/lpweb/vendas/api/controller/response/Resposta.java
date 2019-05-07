@@ -24,4 +24,8 @@ public class Resposta<T> {
     public void setErros(List<Erro> erros) {
         this.erros = erros;
     }
+
+    public void adiciona(Erro erro) {
+        erros.add(erro );
+    }
 }

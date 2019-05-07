@@ -1,6 +1,7 @@
 package dcomp.lpweb.vendas.api.controller;
 
 import dcomp.lpweb.vendas.api.controller.dto.CategoriaDTO;
+import dcomp.lpweb.vendas.api.controller.response.Erro;
 import dcomp.lpweb.vendas.api.controller.response.Resposta;
 import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.service.CategoriaService;
@@ -10,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -20,6 +22,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/categorias")
@@ -54,7 +57,17 @@ public class CategoriaController {
 
 
     @PostMapping
-    public ResponseEntity<Resposta<CategoriaDTO>> salva(@Valid @RequestBody CategoriaDTO categoriaDTO ) {
+    public ResponseEntity<Resposta<CategoriaDTO>> salva(@Valid @RequestBody CategoriaDTO categoriaDTO,
+                                                        BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors() ) {
+            Resposta<CategoriaDTO> resposta = new Resposta<>();
+
+            bindingResult.getFieldErrors()
+                      .forEach(erro -> resposta.adiciona(new Erro(erro.getField(), erro.getDefaultMessage())) );
+
+            return ResponseEntity.badRequest().body(resposta);
+        }
 
         Categoria categoria = new Categoria();
         BeanUtils.copyProperties(categoriaDTO, categoria);
