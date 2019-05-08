@@ -1,28 +1,21 @@
 package dcomp.lpweb.vendas.api.controller;
 
 import dcomp.lpweb.vendas.api.controller.dto.CategoriaDTO;
-import dcomp.lpweb.vendas.api.controller.response.Erro;
 import dcomp.lpweb.vendas.api.controller.response.Resposta;
 import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.service.CategoriaService;
-
 import dcomp.lpweb.vendas.api.util.PropriedadesUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/categorias")
@@ -40,39 +33,22 @@ public class CategoriaController {
     public Resposta<List<CategoriaDTO>> todas() {
 
         List<Categoria> categorias = categoriaService.todas();
-
         List<CategoriaDTO> categoriasDTO = new ArrayList<>(categorias.size() );
 
-        categorias.forEach(categoria -> {
-                                  CategoriaDTO categoriaDTO = new CategoriaDTO();
-                                  BeanUtils.copyProperties(categoria, categoriaDTO);
-                                  categoriasDTO.add(categoriaDTO );
-                           });
+        categorias.forEach(categoria ->  categoriasDTO.add(new CategoriaDTO().comDadosDe(categoria)) );
 
         Resposta<List<CategoriaDTO>> resposta = new Resposta<>();
-        resposta.setDados(categoriasDTO);
+        resposta.setDados(categoriasDTO );
 
         return resposta;
     }
 
 
     @PostMapping
-    public ResponseEntity<Resposta<CategoriaDTO>> salva(@Valid @RequestBody CategoriaDTO categoriaDTO,
-                                                        BindingResult bindingResult) {
+        public ResponseEntity<Resposta<CategoriaDTO>> salva(@Valid @RequestBody CategoriaDTO categoriaDTO ) {
 
-        if(bindingResult.hasErrors() ) {
-            Resposta<CategoriaDTO> resposta = new Resposta<>();
 
-            bindingResult.getFieldErrors()
-                      .forEach(erro -> resposta.adiciona(new Erro(erro.getField(), erro.getDefaultMessage())) );
-
-            return ResponseEntity.badRequest().body(resposta);
-        }
-
-        Categoria categoria = new Categoria();
-        BeanUtils.copyProperties(categoriaDTO, categoria);
-
-        Categoria categoriaSalva = categoriaService.salva(categoria );
+            Categoria categoriaSalva = categoriaService.salva(categoriaDTO.getCategoria() );
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -80,11 +56,8 @@ public class CategoriaController {
                 .buildAndExpand(categoriaSalva.getId())
                 .toUri();
 
-        BeanUtils.copyProperties(categoriaSalva, categoriaDTO );
-
-        //TODO Refatorar este código, duplicado em outros métodos
         Resposta<CategoriaDTO> resposta = new Resposta<>();
-        resposta.setDados(categoriaDTO );
+        resposta.setDados(categoriaDTO.comDadosDe(categoriaSalva ) );
 
         return ResponseEntity.created(uri).body(resposta );
     }
@@ -93,15 +66,13 @@ public class CategoriaController {
     public Resposta<CategoriaDTO> buscaPor(@PathVariable Integer id) {
 
         Categoria categoria = categoriaService.buscaPor(id);
-        CategoriaDTO categoriaDTO = new CategoriaDTO();
-
-        BeanUtils.copyProperties(categoria, categoriaDTO);
 
         Resposta<CategoriaDTO> resposta = new Resposta<>();
-        resposta.setDados(categoriaDTO );
+        resposta.setDados(new CategoriaDTO().comDadosDe(categoria ) );
 
         return resposta;
     }
+
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -113,18 +84,14 @@ public class CategoriaController {
     @PutMapping("/{id}")
     public Resposta<CategoriaDTO> altera(@PathVariable  Integer id, @RequestBody CategoriaDTO categoriaDTO) {
 
-
         Categoria categoria = categoriaService.buscaPor(id );
 
-        BeanUtils.copyProperties(categoriaDTO,
-                categoria,
-                PropriedadesUtil.obterPropriedadesComNullDe(categoriaDTO) );
+        categoria = categoriaDTO.atualizaIgnorandoNuloA(categoria );
 
         Categoria categoriaAtualizada = categoriaService.atualiza(id, categoria);
-        BeanUtils.copyProperties(categoriaAtualizada, categoriaDTO );
 
         Resposta<CategoriaDTO> resposta = new Resposta<>();
-        resposta.setDados(categoriaDTO );
+        resposta.setDados(categoriaDTO.comDadosDe(categoriaAtualizada) );
 
         return resposta;
     }

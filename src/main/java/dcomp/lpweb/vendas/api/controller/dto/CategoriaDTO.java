@@ -1,5 +1,10 @@
 package dcomp.lpweb.vendas.api.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import dcomp.lpweb.vendas.api.model.Categoria;
+import dcomp.lpweb.vendas.api.util.PropriedadesUtil;
+import org.springframework.beans.BeanUtils;
+
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -45,4 +50,27 @@ public class CategoriaDTO {
     }
 
 
+    @JsonIgnore
+    public Categoria getCategoria() {
+        Categoria categoria = new Categoria();
+        BeanUtils.copyProperties(this, categoria);
+
+        return categoria;
+    }
+
+    public CategoriaDTO comDadosDe(Categoria categoria) {
+        BeanUtils.copyProperties(categoria, this );
+
+        return this;
+
+    }
+
+    public Categoria atualizaIgnorandoNuloA(Categoria categoria) {
+
+        BeanUtils.copyProperties(this,
+                categoria,
+                PropriedadesUtil.obterPropriedadesComNullDe(this) );
+
+        return categoria;
+    }
 }
