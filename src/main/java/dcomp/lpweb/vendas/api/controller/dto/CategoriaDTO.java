@@ -5,14 +5,8 @@ import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.util.PropriedadesUtil;
 import org.springframework.beans.BeanUtils;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 public class CategoriaDTO {
 

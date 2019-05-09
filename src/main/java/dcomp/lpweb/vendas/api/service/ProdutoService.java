@@ -56,6 +56,10 @@ public class ProdutoService {
     public Produto salva(Produto produto) {
         return produtoRepository.save(produto );
     }
+
+    public Produto buscaPor(Integer id) {
+        return produtoRepository.findById(id).get();
+    }
 }
 
 

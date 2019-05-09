@@ -24,7 +24,7 @@ public class Produto {
     @JoinTable(name = "produto_categoria",
                joinColumns = @JoinColumn(name = "produto_id"),
                inverseJoinColumns = @JoinColumn(name = "categoria_id")    )
-    private final List<Categoria> categorias = new ArrayList<>();
+    private List<Categoria> categorias = new ArrayList<>();
 
 
     public Integer getId() {
@@ -61,6 +61,10 @@ public class Produto {
 
     public List<Categoria> getCategorias() {
         return categorias;
+    }
+
+    public void setCategorias(List<Categoria> categorias) {
+        this.categorias = categorias;
     }
 
     public void adiciona(Categoria categoria ) {
