@@ -45,10 +45,10 @@ public class CategoriaController {
 
 
     @PostMapping
-        public ResponseEntity<Resposta<CategoriaDTO>> salva(@Valid @RequestBody CategoriaDTO categoriaDTO ) {
+    public ResponseEntity<Resposta<CategoriaDTO>> salva(@Valid @RequestBody CategoriaDTO categoriaDTO ) {
 
 
-            Categoria categoriaSalva = categoriaService.salva(categoriaDTO.getCategoria() );
+        Categoria categoriaSalva = categoriaService.salva(categoriaDTO.getCategoria() );
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()

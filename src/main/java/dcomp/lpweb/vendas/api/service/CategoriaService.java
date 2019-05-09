@@ -4,10 +4,12 @@ import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.repository.CategoriaRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoriaService {
@@ -33,7 +35,12 @@ public class CategoriaService {
 
     @Transactional(readOnly = true)
     public Categoria buscaPor(Integer id) {
-        return categoriaRepository.findById(id).get();
+       categoriaRepository
+                .findById(id)
+                .orElseThrow(() -> new EmptyResultDataAccessException(1) );
+
+
+        return null;
 
     }
 

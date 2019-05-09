@@ -37,7 +37,6 @@ public class Cliente {
             name = "telefones",
             joinColumns = @JoinColumn(name = "cliente_id")
     )
-
     @Column(name = "numero")
     private Set<@NotEmpty String> telefones = new LinkedHashSet<>();
 
