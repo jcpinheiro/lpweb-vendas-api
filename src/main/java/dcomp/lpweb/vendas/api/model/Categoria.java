@@ -84,4 +84,13 @@ public class Categoria {
     public LocalDateTime getMomentoCriacao() {
         return momentoCriacao;
     }
+
+    @Override
+    public String toString() {
+        return "Categoria{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", descricao='" + descricao + '\'' +
+                '}';
+    }
 }

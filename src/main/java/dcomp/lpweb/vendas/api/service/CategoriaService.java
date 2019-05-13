@@ -35,13 +35,9 @@ public class CategoriaService {
 
     @Transactional(readOnly = true)
     public Categoria buscaPor(Integer id) {
-       categoriaRepository
+        return categoriaRepository
                 .findById(id)
-                .orElseThrow(() -> new EmptyResultDataAccessException(1) );
-
-
-        return null;
-
+                .orElseThrow(() -> new EmptyResultDataAccessException(1));
     }
 
     @Transactional

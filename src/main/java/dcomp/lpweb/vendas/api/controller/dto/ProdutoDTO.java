@@ -1,17 +1,20 @@
 package dcomp.lpweb.vendas.api.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.model.Produto;
+import dcomp.lpweb.vendas.api.service.CategoriaService;
 import dcomp.lpweb.vendas.api.util.PropriedadesUtil;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ProdutoDTO {
 
@@ -20,13 +23,16 @@ public class ProdutoDTO {
     @NotEmpty
     private String nome;
 
-    @DecimalMin(value = "0.01")
     private BigDecimal precoAtual;
 
     @NotNull
     private Boolean ativo;
 
-    private List<Categoria> categorias = new ArrayList<>();
+    @JsonProperty("categorias")
+    private Set<CategoriaDTO> categoriasDTO = new LinkedHashSet<>();
+
+    @Autowired
+    private CategoriaService categoriaService;
 
     public Integer getId() {
         return id;
@@ -60,26 +66,39 @@ public class ProdutoDTO {
         this.ativo = ativo;
     }
 
-
-    public List<Categoria> getCategorias() {
-        return categorias;
+    public Set<CategoriaDTO> getCategoriasDTO() {
+        return categoriasDTO;
     }
 
-    public void setCategorias(List<Categoria> categorias ) {
-        this.categorias = categorias;
+    public void setCategoriasDTO(Set<CategoriaDTO> categoriasDTO) {
+        this.categoriasDTO = categoriasDTO;
     }
-
 
     @JsonIgnore
     public Produto getProduto() {
         Produto produto = new Produto();
         BeanUtils.copyProperties(this, produto);
 
+        if ( Objects.nonNull(this.getCategoriasDTO()) )
+            this.getCategoriasDTO().forEach(catDTO -> produto.adiciona(catDTO.getCategoria()) );
+
+        System.out.println("############ -> " + produto );
+
+
         return produto;
     }
 
     public ProdutoDTO comDadosDe(Produto produto) {
         BeanUtils.copyProperties(produto, this);
+
+        if (Objects.nonNull(produto.getCategorias() )
+           && Objects.nonNull(this.categoriasDTO)
+           && this.categoriasDTO.isEmpty() ) {
+
+                produto.getCategorias()
+                        .forEach(cat -> this.categoriasDTO.add(new CategoriaDTO().comDadosDe(cat)) );
+        }
+
         return this;
     }
 
@@ -93,4 +112,14 @@ public class ProdutoDTO {
     }
 
 
+    @Override
+    public String toString() {
+        return "ProdutoDTO{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", precoAtual=" + precoAtual +
+                ", ativo=" + ativo +
+                ", categoriasDTO=" + categoriasDTO +
+                '}';
+    }
 }

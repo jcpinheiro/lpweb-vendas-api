@@ -3,8 +3,10 @@ package dcomp.lpweb.vendas.api.controller.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.util.PropriedadesUtil;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.BeanUtils;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -16,7 +18,7 @@ public class CategoriaDTO {
     @Size(min = 2, max = 50)
     private String nome;
 
-    @Size(min = 5, message = "A descrição deve ter o mínimo de 5 caracteres")
+    @Size(min = 5)
     private String descricao;
 
     public Integer getId() {
@@ -66,5 +68,15 @@ public class CategoriaDTO {
                 PropriedadesUtil.obterPropriedadesComNullDe(this) );
 
         return categoria;
+    }
+
+
+    @Override
+    public String toString() {
+        return "CategoriaDTO{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", descricao='" + descricao + '\'' +
+                '}';
     }
 }

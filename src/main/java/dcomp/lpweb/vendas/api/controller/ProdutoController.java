@@ -31,21 +31,27 @@ public class ProdutoController {
     public Resposta<List<ProdutoDTO>> buscaTodos() {
 
         List<Produto> produtos = produtoService.todos();
+
         ArrayList<ProdutoDTO> produtosDTO = new ArrayList<>(produtos.size());
 
-        produtos.forEach(p -> produtosDTO.add(new ProdutoDTO().comDadosDe(p)));
+        produtos.forEach(p -> {
+            ProdutoDTO produtoDTO = new ProdutoDTO().comDadosDe(p);
+            System.out.println("### ProdutoDTO " + produtoDTO );
+            produtosDTO.add(produtoDTO);
+
+        });
 
         Resposta<List<ProdutoDTO>> resposta = new Resposta<>();
-        resposta.setDados(produtosDTO);
+        resposta.setDados(produtosDTO );
 
         return resposta;
     }
 
 
     @PostMapping
-    public ResponseEntity<Resposta<ProdutoDTO>> salva(@RequestBody ProdutoDTO produtoDTO )  {
+    public ResponseEntity<Resposta<ProdutoDTO>> salva(@Valid @RequestBody ProdutoDTO produtoDTO )  {
 
-        Produto produtoSalvo = produtoService.salva(produtoDTO.getProduto());
+        Produto produtoSalvo = produtoService.salva(produtoDTO.getProduto() );
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -65,6 +71,7 @@ public class ProdutoController {
     public Resposta<ProdutoDTO> buscaPor(@PathVariable Integer id) {
 
         Produto produto = produtoService.buscaPor(id);
+
 
         Resposta<ProdutoDTO> resposta = new Resposta<>();
         resposta.setDados(new ProdutoDTO().comDadosDe(produto ) );
