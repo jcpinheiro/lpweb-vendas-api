@@ -1,8 +1,11 @@
 package dcomp.lpweb.vendas.api.controller;
 
 
+import dcomp.lpweb.vendas.api.controller.dto.CategoriaDTO;
 import dcomp.lpweb.vendas.api.controller.dto.ProdutoDTO;
+import dcomp.lpweb.vendas.api.controller.response.Erro;
 import dcomp.lpweb.vendas.api.controller.response.Resposta;
+import dcomp.lpweb.vendas.api.controller.validation.Validacao;
 import dcomp.lpweb.vendas.api.model.Produto;
 import dcomp.lpweb.vendas.api.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/produtos")
@@ -38,7 +42,6 @@ public class ProdutoController {
             ProdutoDTO produtoDTO = new ProdutoDTO().comDadosDe(p);
             System.out.println("### ProdutoDTO " + produtoDTO );
             produtosDTO.add(produtoDTO);
-
         });
 
         Resposta<List<ProdutoDTO>> resposta = new Resposta<>();
@@ -62,7 +65,6 @@ public class ProdutoController {
         Resposta<ProdutoDTO> resposta = new Resposta<>();
         resposta.setDados(produtoDTO.comDadosDe(produtoSalvo ));
 
-
         return ResponseEntity.created(uri).body(resposta );
     }
 
@@ -72,7 +74,6 @@ public class ProdutoController {
 
         Produto produto = produtoService.buscaPor(id);
 
-
         Resposta<ProdutoDTO> resposta = new Resposta<>();
         resposta.setDados(new ProdutoDTO().comDadosDe(produto ) );
 
@@ -80,9 +81,26 @@ public class ProdutoController {
     }
 
     @PutMapping("/{id}")
-    public ProdutoDTO atualiza(@PathVariable Integer id, @RequestBody ProdutoDTO produtoDTO) {
-        Produto produtoAtualizado = produtoService.atualiza(id, produtoDTO.getProduto());
-        return produtoDTO.comDadosDe(produtoAtualizado );
+    public ResponseEntity<Resposta<ProdutoDTO>> atualiza(@PathVariable Integer id, @RequestBody ProdutoDTO produtoDTO) {
+       // Produto produtoAtualizado = produtoService.atualiza(id, produtoDTO.getProduto());
+
+        Produto produto = produtoService.buscaPor(id);
+        produto = produtoDTO.atualizaIgnorandoNulo(produto );
+
+        Resposta<ProdutoDTO> resposta = new Resposta<>();
+
+        Validacao<ProdutoDTO> validacao = new Validacao<>();
+        List<Erro> erros =  validacao.valida(produtoDTO.comDadosDe(produto) );
+
+        if (Objects.nonNull( erros ) &&  !erros.isEmpty() ) {
+            resposta.setErros(erros );
+            return ResponseEntity.badRequest().body(resposta );
+        }
+
+        Produto produtoAtualizado = produtoService.atualiza(id, produto);
+        resposta.setDados(new ProdutoDTO().comDadosDe(produtoAtualizado));
+
+        return ResponseEntity.ok(resposta );
     }
 
 
@@ -90,7 +108,6 @@ public class ProdutoController {
     public ProdutoDTO atualiza(@PathVariable Integer id, @RequestBody Boolean ativo) {
         Produto produtoSalvo = produtoService.atualizaPropriedadeAtivo(id, ativo);
         return new ProdutoDTO().comDadosDe(produtoSalvo );
-
     }
 
 

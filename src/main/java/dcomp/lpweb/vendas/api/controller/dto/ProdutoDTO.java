@@ -1,9 +1,7 @@
 package dcomp.lpweb.vendas.api.controller.dto;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.model.Produto;
 import dcomp.lpweb.vendas.api.service.CategoriaService;
 import dcomp.lpweb.vendas.api.util.PropriedadesUtil;
@@ -14,7 +12,9 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Objects;
+import java.util.Set;
 
 public class ProdutoDTO {
 
@@ -23,6 +23,7 @@ public class ProdutoDTO {
     @NotEmpty
     private String nome;
 
+    @DecimalMin("0.01")
     private BigDecimal precoAtual;
 
     @NotNull
@@ -121,5 +122,13 @@ public class ProdutoDTO {
                 ", ativo=" + ativo +
                 ", categoriasDTO=" + categoriasDTO +
                 '}';
+    }
+
+    public Produto atualizaIgnorandoNulo(Produto produto) {
+           BeanUtils.copyProperties(this,
+                    produto,
+                    PropriedadesUtil.obterPropriedadesComNullDe(this) );
+
+            return produto;
     }
 }
