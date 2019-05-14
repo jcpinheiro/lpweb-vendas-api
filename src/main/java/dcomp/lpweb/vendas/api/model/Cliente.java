@@ -25,6 +25,7 @@ public class Cliente {
 
     @NotEmpty
     @CPF
+    @Column(unique = true)
     private String cpf;
 
     @NotNull
@@ -41,7 +42,7 @@ public class Cliente {
     private Set<@NotEmpty String> telefones = new LinkedHashSet<>();
 
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Endereco> enderecos = new ArrayList<>();
 
 
@@ -69,6 +70,13 @@ public class Cliente {
         this.email = email;
     }
 
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
 
     public TipoCliente getTipo() {
         return tipo;
@@ -86,7 +94,7 @@ public class Cliente {
         this.enderecos = enderecos;
     }
 
-    public void adicionaUmEndereco(Endereco endereco) {
+    public void adicionaUm(Endereco endereco) {
         this.enderecos.add(endereco );
     }
 

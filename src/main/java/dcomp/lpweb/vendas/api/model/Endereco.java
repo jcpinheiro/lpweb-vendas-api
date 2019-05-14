@@ -24,9 +24,11 @@ public class Endereco {
 
     private String cep;
 
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "cliente_id", nullable = false)
+    @JoinColumn(name = "cliente_id", nullable = false )
     private Cliente cliente;
+
 
     public Integer getId() {
         return id;

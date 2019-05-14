@@ -17,7 +17,7 @@ final class GenericoService<T> {
 
 
     T salva(T entity) {
-        return repository.save(entity);
+        return repository.save(entity ) ;
     }
 
 
