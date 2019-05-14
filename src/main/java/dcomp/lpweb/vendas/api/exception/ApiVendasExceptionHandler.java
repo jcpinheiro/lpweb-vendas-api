@@ -29,9 +29,8 @@ public class ApiVendasExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
                                                                   HttpHeaders headers, HttpStatus status,
                                                                   WebRequest request) {
-
         final Resposta<Erro> resp = new Resposta<>();
-        final String mensagem = messageSource.getMessage("propriedade.invalida", null, new Locale("pt", "BR"));
+        final String mensagem = messageSource.getMessage("parametro.invalido", null, new Locale("pt", "BR"));
 
         resp.adiciona(new Erro(mensagem, ex.getLocalizedMessage()) );
 
@@ -44,14 +43,12 @@ public class ApiVendasExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers, HttpStatus status, WebRequest request) {
 
         final Resposta<Erro> resp = new Resposta<>();
-
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
 
         fieldErrors.forEach(fieldError ->
                 resp.adiciona(
                         new Erro(fieldError.getDefaultMessage(),
                                  ex.getLocalizedMessage() )) );
-
 
         return super.handleExceptionInternal(ex, resp, headers, HttpStatus.BAD_REQUEST, request);
 
@@ -64,7 +61,6 @@ public class ApiVendasExceptionHandler extends ResponseEntityExceptionHandler {
 
         String mensagem = String.format("Recurso nao encontrado, esperado %d, encontrado %d ",
                                          ex.getExpectedSize(), ex.getActualSize());
-
         resposta.adiciona(new Erro(mensagem, ex.getMostSpecificCause().toString() ));
 
         return resposta;

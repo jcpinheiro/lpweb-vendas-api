@@ -102,8 +102,6 @@ public class ProdutoDTO {
 
     public Produto atualizaIgnorandoNulo(Produto produto) {
         Set<Categoria> categorias = produto.getCategorias();
-
-        System.out.println("@@@@@@@@@@@@@ this" + this );
         BeanUtils.copyProperties(this,
                     produto,
                     PropriedadesUtil.obterPropriedadesComNullDe(this) );

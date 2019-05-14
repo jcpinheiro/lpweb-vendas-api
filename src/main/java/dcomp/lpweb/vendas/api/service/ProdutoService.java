@@ -59,7 +59,7 @@ public class ProdutoService {
 
     }
 
-    // TODO Verificar a necessidade de remover este método
+    // TODO Verificar a necessidade de manter este método
     private void atualizaAsCategoriasDe(Produto produto) {
         Set<Categoria> categorias = produto.getCategorias();
 

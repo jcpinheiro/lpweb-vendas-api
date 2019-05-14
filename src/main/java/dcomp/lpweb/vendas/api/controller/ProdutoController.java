@@ -1,7 +1,6 @@
 package dcomp.lpweb.vendas.api.controller;
 
 
-import dcomp.lpweb.vendas.api.controller.dto.CategoriaDTO;
 import dcomp.lpweb.vendas.api.controller.dto.ProdutoDTO;
 import dcomp.lpweb.vendas.api.controller.response.Erro;
 import dcomp.lpweb.vendas.api.controller.response.Resposta;
@@ -82,9 +81,7 @@ public class ProdutoController {
     @PutMapping("/{id}")
     public ResponseEntity<Resposta<ProdutoDTO>> atualiza(@PathVariable Integer id, @RequestBody ProdutoDTO produtoDTO) {
 
-        Produto produto = produtoService.buscaPor(id );
-
-        produto = produtoDTO.atualizaIgnorandoNulo(produto );
+        Produto produto = produtoDTO.atualizaIgnorandoNulo(produtoService.buscaPor(id ) );
 
         Resposta<ProdutoDTO> resposta = new Resposta<>();
 
@@ -97,7 +94,7 @@ public class ProdutoController {
         }
 
         Produto produtoAtualizado = produtoService.atualiza(id, produto);
-        resposta.setDados(new ProdutoDTO().comDadosDe(produtoAtualizado));
+        resposta.setDados(new ProdutoDTO().comDadosDe(produtoAtualizado) );
 
         return ResponseEntity.ok(resposta );
     }
