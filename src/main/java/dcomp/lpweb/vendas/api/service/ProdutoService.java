@@ -4,7 +4,6 @@ package dcomp.lpweb.vendas.api.service;
 import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.model.Produto;
 import dcomp.lpweb.vendas.api.repository.ProdutoRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,36 +14,33 @@ import java.util.Objects;
 @Service
 public class ProdutoService {
 
-
     private final ProdutoRepository produtoRepository;
 
     @Autowired
     private CategoriaService categoriaService;
 
-    @Autowired
-    public ProdutoService(ProdutoRepository produtoRepository) {
-        this.produtoRepository = produtoRepository;
-    }
+    private final GenericoService<Produto> genericoService;
 
+    @Autowired
+    public ProdutoService(ProdutoRepository produtoRepository ) {
+        this.produtoRepository = produtoRepository;
+        this.genericoService = new GenericoService<>(produtoRepository );
+    }
 
     @Transactional(readOnly = true)
     public List<Produto> todos() {
-        return produtoRepository.findAll();
+        return genericoService.todos();
     }
 
-    private Produto buscaPorId(Integer id) {
-        return produtoRepository.findById(id).get();
-
+    @Transactional(readOnly = true)
+    Produto buscaPorId(Integer id) {
+        return genericoService.buscaPor(id );
     }
-
 
     @Transactional
     public Produto salva(Produto produto) {
-        Produto produtoSalvo = produtoRepository.save(produto);
-        //atualizaAsCategoriasDe(produtoSalvo );
-        System.out.println("############# " + produtoSalvo.getCategorias());
-
-        return produtoSalvo;
+        validaCategorias( produto.getCategorias() );
+        return genericoService.salva(produto );
     }
 
 
@@ -54,19 +50,15 @@ public class ProdutoService {
         produto.setAtivo(ativo );
 
         return produto;
-
     }
 
     @Transactional
     public Produto atualiza(Integer id, Produto produto) {
-
-        Produto produtoSalvo = this.buscaPorId(id);
-        BeanUtils.copyProperties(produto, produtoSalvo, "id");
-
-        return produtoSalvo;
+        return genericoService.atualiza(produto, id );
 
     }
 
+    // TODO Verificar a necessidade de remover este método
     private void atualizaAsCategoriasDe(Produto produto) {
         List<Categoria> categorias = produto.getCategorias();
 
@@ -78,12 +70,23 @@ public class ProdutoService {
                    }
                });
         }
-
-
+        
     }
 
     public Produto buscaPor(Integer id) {
-        return produtoRepository.findById(id).get();
+        return genericoService.buscaPor(id );
+    }
+
+    private void validaCategorias(List<Categoria> categorias) {
+        if (categorias !=null && !categorias.isEmpty() ) {
+
+            categorias.forEach(c -> {
+
+                Categoria categoria = Objects.requireNonNull(c,"A categoria não pode ser nula");
+                Integer id = Objects.requireNonNull(c.getId(),"O id da categoria não pode ser nulo");
+                categoriaService.buscaPor(id);
+            });
+        }
     }
 }
 

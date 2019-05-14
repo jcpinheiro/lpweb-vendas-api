@@ -8,6 +8,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "produto")
+@NamedEntityGraph(name = "Produto.categorias",
+        attributeNodes = @NamedAttributeNode("categorias"))
 public class Produto {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +22,8 @@ public class Produto {
 
     private Boolean ativo;
 
+
+    // TODO Mudar para Set<Categoria>
     @ManyToMany
     @JoinTable(name = "produto_categoria",
                joinColumns = @JoinColumn(name = "produto_id"),

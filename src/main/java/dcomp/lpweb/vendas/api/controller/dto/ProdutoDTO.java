@@ -2,6 +2,7 @@ package dcomp.lpweb.vendas.api.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.model.Produto;
 import dcomp.lpweb.vendas.api.service.CategoriaService;
 import dcomp.lpweb.vendas.api.util.PropriedadesUtil;
@@ -13,6 +14,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -99,19 +101,23 @@ public class ProdutoDTO {
                 produto.getCategorias()
                         .forEach(cat -> this.categoriasDTO.add(new CategoriaDTO().comDadosDe(cat)) );
         }
-
         return this;
     }
 
-    public Produto atualizaIgnorandoNuloEm(Produto produto) {
 
+    public Produto atualizaIgnorandoNulo(Produto produto) {
+        List<Categoria> categorias = produto.getCategorias();
+
+        System.out.println("@@@@@@@@@@@@@ this" + this );
         BeanUtils.copyProperties(this,
-                produto,
-                PropriedadesUtil.obterPropriedadesComNullDe(this));
+                    produto,
+                    PropriedadesUtil.obterPropriedadesComNullDe(this) );
 
+        if ( !this.categoriasDTO.isEmpty() ) {
+            categoriasDTO.forEach(cDTO -> produto.adiciona(cDTO.getCategoria() ));
+        }
         return produto;
     }
-
 
     @Override
     public String toString() {
@@ -124,11 +130,4 @@ public class ProdutoDTO {
                 '}';
     }
 
-    public Produto atualizaIgnorandoNulo(Produto produto) {
-           BeanUtils.copyProperties(this,
-                    produto,
-                    PropriedadesUtil.obterPropriedadesComNullDe(this) );
-
-            return produto;
-    }
 }

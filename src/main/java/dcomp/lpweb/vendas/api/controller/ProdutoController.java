@@ -82,9 +82,9 @@ public class ProdutoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Resposta<ProdutoDTO>> atualiza(@PathVariable Integer id, @RequestBody ProdutoDTO produtoDTO) {
-       // Produto produtoAtualizado = produtoService.atualiza(id, produtoDTO.getProduto());
 
-        Produto produto = produtoService.buscaPor(id);
+        Produto produto = produtoService.buscaPor(id );
+
         produto = produtoDTO.atualizaIgnorandoNulo(produto );
 
         Resposta<ProdutoDTO> resposta = new Resposta<>();
@@ -109,7 +109,4 @@ public class ProdutoController {
         Produto produtoSalvo = produtoService.atualizaPropriedadeAtivo(id, ativo);
         return new ProdutoDTO().comDadosDe(produtoSalvo );
     }
-
-
-
 }

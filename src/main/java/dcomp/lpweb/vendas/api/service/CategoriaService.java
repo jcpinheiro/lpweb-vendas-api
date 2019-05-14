@@ -2,55 +2,49 @@ package dcomp.lpweb.vendas.api.service;
 
 import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.repository.CategoriaRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
 
+    private final GenericoService<Categoria> genericoService;
+    
     @Autowired
     public CategoriaService(CategoriaRepository categoriaRepository) {
-
         this.categoriaRepository = categoriaRepository;
+
+        genericoService = new GenericoService<>(categoriaRepository);
     }
 
     @Transactional(readOnly = true)
     public List<Categoria> todas() {
-        return categoriaRepository.findAll();
+        return genericoService.todos();
     }
 
     @Transactional
     public Categoria salva(Categoria categoria) {
-        return categoriaRepository.save(categoria );
+        return genericoService.salva(categoria );
 
     }
 
     @Transactional(readOnly = true)
-    public Categoria buscaPor(Integer id) {
-        return categoriaRepository
-                .findById(id)
-                .orElseThrow(() -> new EmptyResultDataAccessException(1));
+    public Categoria buscaPor(Integer id ) {
+        return genericoService.buscaPor(id );
     }
 
     @Transactional
     public void excluiPor(Integer id) {
-        categoriaRepository.deleteById(id );
+        genericoService.excluirPor(id );
     }
 
     @Transactional
     public Categoria atualiza(Integer id, Categoria categoria) {
-
-        Categoria categoriaSalva = this.buscaPor(id);
-        BeanUtils.copyProperties(categoria, categoriaSalva, "id");
-
-        return  categoriaSalva;
+        return  genericoService.atualiza(categoria, id );
     }
 }
