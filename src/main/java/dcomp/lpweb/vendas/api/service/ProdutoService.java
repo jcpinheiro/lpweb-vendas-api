@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 public class ProdutoService {
@@ -60,7 +61,7 @@ public class ProdutoService {
 
     // TODO Verificar a necessidade de remover este método
     private void atualizaAsCategoriasDe(Produto produto) {
-        List<Categoria> categorias = produto.getCategorias();
+        Set<Categoria> categorias = produto.getCategorias();
 
         if (Objects.nonNull(categorias) && !categorias.isEmpty()) {
             categorias
@@ -77,7 +78,7 @@ public class ProdutoService {
         return genericoService.buscaPor(id );
     }
 
-    private void validaCategorias(List<Categoria> categorias) {
+    private void validaCategorias(Set<Categoria> categorias) {
         if (categorias !=null && !categorias.isEmpty() ) {
 
             categorias.forEach(c -> {

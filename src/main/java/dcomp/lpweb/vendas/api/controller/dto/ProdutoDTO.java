@@ -14,7 +14,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -85,9 +84,6 @@ public class ProdutoDTO {
         if ( Objects.nonNull(this.getCategoriasDTO()) )
             this.getCategoriasDTO().forEach(catDTO -> produto.adiciona(catDTO.getCategoria()) );
 
-        System.out.println("############ -> " + produto );
-
-
         return produto;
     }
 
@@ -104,9 +100,8 @@ public class ProdutoDTO {
         return this;
     }
 
-
     public Produto atualizaIgnorandoNulo(Produto produto) {
-        List<Categoria> categorias = produto.getCategorias();
+        Set<Categoria> categorias = produto.getCategorias();
 
         System.out.println("@@@@@@@@@@@@@ this" + this );
         BeanUtils.copyProperties(this,
@@ -130,4 +125,16 @@ public class ProdutoDTO {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProdutoDTO that = (ProdutoDTO) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

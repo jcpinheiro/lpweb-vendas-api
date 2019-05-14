@@ -40,7 +40,6 @@ public class ProdutoController {
 
         produtos.forEach(p -> {
             ProdutoDTO produtoDTO = new ProdutoDTO().comDadosDe(p);
-            System.out.println("### ProdutoDTO " + produtoDTO );
             produtosDTO.add(produtoDTO);
         });
 

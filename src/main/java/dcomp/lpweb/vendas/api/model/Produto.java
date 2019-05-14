@@ -4,12 +4,12 @@ package dcomp.lpweb.vendas.api.model;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "produto")
-@NamedEntityGraph(name = "Produto.categorias",
-        attributeNodes = @NamedAttributeNode("categorias"))
 public class Produto {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,14 +22,11 @@ public class Produto {
 
     private Boolean ativo;
 
-
-    // TODO Mudar para Set<Categoria>
     @ManyToMany
     @JoinTable(name = "produto_categoria",
                joinColumns = @JoinColumn(name = "produto_id"),
                inverseJoinColumns = @JoinColumn(name = "categoria_id")    )
-    private List<Categoria> categorias = new ArrayList<>();
-
+    private Set<Categoria> categorias = new LinkedHashSet<>();
 
     public Integer getId() {
         return id;
@@ -63,11 +60,11 @@ public class Produto {
         this.ativo = ativo;
     }
 
-    public List<Categoria> getCategorias() {
+    public Set<Categoria> getCategorias() {
         return categorias;
     }
 
-    public void setCategorias(List<Categoria> categorias) {
+    public void setCategorias(Set<Categoria> categorias) {
         this.categorias = categorias;
     }
 

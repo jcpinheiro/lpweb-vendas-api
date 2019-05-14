@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "categoria")
@@ -30,7 +28,7 @@ public class Categoria {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "categorias")
-    private final List<Produto> produtos = new ArrayList<>();
+    private final Set<Produto> produtos = new LinkedHashSet<>();
 
 
     public Categoria() {}
@@ -55,9 +53,20 @@ public class Categoria {
         this.nome = nome;
     }
 
-
-    public List<Produto> getProdutos() {
+    public Set<Produto> getProdutos() {
         return produtos;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public LocalDateTime getMomentoCriacao() {
+        return momentoCriacao;
     }
 
     @Override
@@ -71,18 +80,6 @@ public class Categoria {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public LocalDateTime getMomentoCriacao() {
-        return momentoCriacao;
     }
 
     @Override
