@@ -2,11 +2,7 @@ package dcomp.lpweb.vendas.api.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dcomp.lpweb.vendas.api.model.Categoria;
-import dcomp.lpweb.vendas.api.util.PropriedadesUtil;
-import org.hibernate.validator.constraints.Length;
-import org.springframework.beans.BeanUtils;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -20,6 +16,8 @@ public class CategoriaDTO {
 
     @Size(min = 5)
     private String descricao;
+
+    private DTO<Categoria, CategoriaDTO> dto = new DTO<>(this);
 
     public Integer getId() {
         return id;
@@ -48,26 +46,15 @@ public class CategoriaDTO {
 
     @JsonIgnore
     public Categoria getCategoria() {
-        Categoria categoria = new Categoria();
-        BeanUtils.copyProperties(this, categoria);
-
-        return categoria;
+        return dto.getEntity(new Categoria() );
     }
 
     public CategoriaDTO comDadosDe(Categoria categoria) {
-        BeanUtils.copyProperties(categoria, this );
-
-        return this;
-
+        return dto.comDadosDe(categoria );
     }
 
     public Categoria atualizaIgnorandoNuloA(Categoria categoria) {
-
-        BeanUtils.copyProperties(this,
-                categoria,
-                PropriedadesUtil.obterPropriedadesComNullDe(this) );
-
-        return categoria;
+        return dto.mergeIgnorandoNulo(categoria );
     }
 
 

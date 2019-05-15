@@ -2,16 +2,12 @@ package dcomp.lpweb.vendas.api.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.model.Produto;
 import dcomp.lpweb.vendas.api.service.CategoriaService;
-import dcomp.lpweb.vendas.api.util.PropriedadesUtil;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -27,7 +23,6 @@ public class ProdutoDTO {
     @DecimalMin("0.01")
     private BigDecimal precoAtual;
 
-    @NotNull
     private Boolean ativo;
 
     @JsonProperty("categorias")
@@ -35,6 +30,9 @@ public class ProdutoDTO {
 
     @Autowired
     private CategoriaService categoriaService;
+
+    private DTO<Produto, ProdutoDTO> dto = new DTO<>(this);
+
 
     public Integer getId() {
         return id;
@@ -78,38 +76,36 @@ public class ProdutoDTO {
 
     @JsonIgnore
     public Produto getProduto() {
-        Produto produto = new Produto();
-        BeanUtils.copyProperties(this, produto);
+        Produto p = dto.getEntity(new Produto() );
+        categoriasDTO.forEach(cDTO -> p.adiciona(cDTO.getCategoria()) );
 
-        if ( Objects.nonNull(this.getCategoriasDTO()) )
-            this.getCategoriasDTO().forEach(catDTO -> produto.adiciona(catDTO.getCategoria()) );
-
-        return produto;
+        return p;
     }
 
     public ProdutoDTO comDadosDe(Produto produto) {
-        BeanUtils.copyProperties(produto, this);
+        dto.comDadosDe(produto );
 
-        if (Objects.nonNull(produto.getCategorias() )
-           && Objects.nonNull(this.categoriasDTO)
-           && this.categoriasDTO.isEmpty() ) {
-
-                produto.getCategorias()
-                        .forEach(cat -> this.categoriasDTO.add(new CategoriaDTO().comDadosDe(cat)) );
+        if (existeCategoriasEm(produto)) {
+            adicionaAsCategoriasDe(produto );
         }
         return this;
     }
 
-    public Produto atualizaIgnorandoNulo(Produto produto) {
-        Set<Categoria> categorias = produto.getCategorias();
-        BeanUtils.copyProperties(this,
-                    produto,
-                    PropriedadesUtil.obterPropriedadesComNullDe(this) );
 
-        if ( !this.categoriasDTO.isEmpty() ) {
-            categoriasDTO.forEach(cDTO -> produto.adiciona(cDTO.getCategoria() ));
-        }
+    public Produto atualizaIgnorandoNulo(Produto produto) {
+        Produto p = dto.mergeIgnorandoNulo(produto );
         return produto;
+    }
+
+    private void adicionaAsCategoriasDe(Produto produto) {
+        produto.getCategorias()
+                .forEach(cat -> this.categoriasDTO.add(new CategoriaDTO().comDadosDe(cat)) );
+    }
+
+    private boolean existeCategoriasEm(Produto produto) {
+        return Objects.nonNull(produto.getCategorias() )
+           && Objects.nonNull(this.categoriasDTO )
+           && this.categoriasDTO.isEmpty();
     }
 
     @Override

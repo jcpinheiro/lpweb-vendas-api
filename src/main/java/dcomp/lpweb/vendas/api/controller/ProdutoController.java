@@ -8,6 +8,7 @@ import dcomp.lpweb.vendas.api.controller.validation.Validacao;
 import dcomp.lpweb.vendas.api.model.Produto;
 import dcomp.lpweb.vendas.api.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -22,6 +23,9 @@ import java.util.Objects;
 @RequestMapping("/produtos")
 public class ProdutoController {
 
+    @Value("${paginacao.qtd_por_pagina}")
+    private Integer quantidadePorPagina;
+
     private final ProdutoService produtoService;
 
     @Autowired
@@ -32,6 +36,8 @@ public class ProdutoController {
 
     @GetMapping
     public Resposta<List<ProdutoDTO>> buscaTodos() {
+
+        System.out.println("Paginação -> " + quantidadePorPagina );
 
         List<Produto> produtos = produtoService.todos();
 

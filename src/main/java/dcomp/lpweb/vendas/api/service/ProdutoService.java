@@ -6,6 +6,7 @@ import dcomp.lpweb.vendas.api.model.Produto;
 import dcomp.lpweb.vendas.api.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class ProdutoService {
 
     @Transactional(readOnly = true)
     public List<Produto> todos() {
+        // ...
         return genericoService.todos();
     }
 
@@ -40,8 +42,12 @@ public class ProdutoService {
 
     @Transactional
     public Produto salva(Produto produto) {
+        // TODO Melhorar o código de validaCategorias()
         validaCategorias( produto.getCategorias() );
-        return genericoService.salva(produto );
+        Produto produtosSalvo = genericoService.salva(produto);
+
+
+        return produtosSalvo;
     }
 
 
@@ -55,23 +61,8 @@ public class ProdutoService {
 
     @Transactional
     public Produto atualiza(Integer id, Produto produto) {
-        return genericoService.atualiza(produto, id );
+       return genericoService.atualiza(produto, id );
 
-    }
-
-    // TODO Verificar a necessidade de manter este método
-    private void atualizaAsCategoriasDe(Produto produto) {
-        Set<Categoria> categorias = produto.getCategorias();
-
-        if (Objects.nonNull(categorias) && !categorias.isEmpty()) {
-            categorias
-               .forEach(c -> {
-                   if( c.getId() != null ) {
-                       c = categoriaService.buscaPor(c.getId() );
-                   }
-               });
-        }
-        
     }
 
     public Produto buscaPor(Integer id) {
@@ -79,15 +70,16 @@ public class ProdutoService {
     }
 
     private void validaCategorias(Set<Categoria> categorias) {
-        if (categorias !=null && !categorias.isEmpty() ) {
 
-            categorias.forEach(c -> {
+        if (categorias !=null && !categorias.isEmpty() )
+            categorias.forEach(this::accept);
+    }
 
-                Categoria categoria = Objects.requireNonNull(c,"A categoria não pode ser nula");
-                Integer id = Objects.requireNonNull(c.getId(),"O id da categoria não pode ser nulo");
-                categoriaService.buscaPor(id);
-            });
-        }
+    // TODO Tratar as mensagens de erro e retornar juntamente com o produto salvo
+    private void accept(Categoria c) {
+        Objects.requireNonNull(c, "A categoria não pode ser nula");
+        Integer id = Objects.requireNonNull(c.getId(), "O id da categoria não pode ser nulo");
+        c = categoriaService.buscaPor(id );
     }
 }
 

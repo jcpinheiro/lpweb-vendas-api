@@ -1,6 +1,5 @@
 package dcomp.lpweb.vendas.api.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.validator.constraints.br.CPF;
 
 import javax.persistence.*;
@@ -41,10 +40,8 @@ public class Cliente {
     @Column(name = "numero")
     private Set<@NotEmpty String> telefones = new LinkedHashSet<>();
 
-
     @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Endereco> enderecos = new ArrayList<>();
-
+    private Set<@NotEmpty Endereco> enderecos = new LinkedHashSet<>();
 
     public Integer getId() {
         return id;
@@ -86,11 +83,11 @@ public class Cliente {
         this.tipo = tipo;
     }
 
-    public List<Endereco> getEnderecos() {
-        return Collections.unmodifiableList(enderecos );
+    public Set<Endereco> getEnderecos() {
+        return enderecos;
     }
 
-    public void setEnderecos(List<Endereco> enderecos) {
+    public void setEnderecos(Set<Endereco> enderecos) {
         this.enderecos = enderecos;
     }
 

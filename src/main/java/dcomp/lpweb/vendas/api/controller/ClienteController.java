@@ -30,7 +30,7 @@ public class ClienteController {
     }
 
     @GetMapping
-    public List<Cliente> listaDeClientes() {
+    public List<Cliente> todos() {
         return clienteService.todos();
     }
 

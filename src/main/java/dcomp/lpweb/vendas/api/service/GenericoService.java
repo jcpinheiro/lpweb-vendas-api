@@ -12,7 +12,7 @@ final class GenericoService<T> {
     private final JpaRepository<T, Integer> repository;
 
     GenericoService(JpaRepository<T, Integer> repository ) {
-       this.repository = repository;
+        this.repository = repository;
     }
 
 
@@ -38,7 +38,7 @@ final class GenericoService<T> {
         return repository
                 .findById(id )
                 .orElseThrow(
-                     () ->new EmptyResultDataAccessException(1) );
+                     () -> new EmptyResultDataAccessException(1) );
     }
 
     public void excluirPor(Integer id) {

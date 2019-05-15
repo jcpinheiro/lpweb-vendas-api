@@ -29,7 +29,6 @@ public class CategoriaController {
         this.categoriaService = categoriaService;
     }
 
-
     @GetMapping
     public Resposta<List<CategoriaDTO>> todas() {
 
@@ -82,28 +81,11 @@ public class CategoriaController {
     }
 
 
- /*   @PutMapping("/{id}")
-    public Resposta<CategoriaDTO> altera(@PathVariable  Integer id, @RequestBody CategoriaDTO categoriaDTO) {
-
-        Categoria categoria = categoriaService.buscaPor(id );
-
-        categoria = categoriaDTO.atualizaIgnorandoNuloA(categoria );
-
-        Categoria categoriaAtualizada = categoriaService.atualiza(id, categoria);
-
-        Resposta<CategoriaDTO> resposta = new Resposta<>();
-        resposta.setDados(categoriaDTO.comDadosDe(categoriaAtualizada) );
-
-        return resposta;
-    }
-*/
-
     @PutMapping("/{id}")
     public ResponseEntity<Resposta<CategoriaDTO>> atualizar(@PathVariable Integer id,
                                                             @RequestBody CategoriaDTO categoriaDTO) {
 
-        Categoria categoria = categoriaService.buscaPor(id);
-        categoria = categoriaDTO.atualizaIgnorandoNuloA(categoria);
+        Categoria categoria = categoriaDTO.atualizaIgnorandoNuloA(categoriaService.buscaPor(id));
 
         Resposta<CategoriaDTO> resposta = new Resposta<>();
 
