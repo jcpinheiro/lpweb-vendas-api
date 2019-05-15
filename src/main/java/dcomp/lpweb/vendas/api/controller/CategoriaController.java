@@ -35,7 +35,7 @@ public class CategoriaController {
         List<Categoria> categorias = categoriaService.todas();
         List<CategoriaDTO> categoriasDTO = new ArrayList<>(categorias.size());
 
-        categorias.forEach(categoria -> categoriasDTO.add(new CategoriaDTO().comDadosDe(categoria)));
+        categorias.forEach(categoria -> categoriasDTO.add(new CategoriaDTO(categoria) ));
 
         Resposta<List<CategoriaDTO>> resposta = new Resposta<>();
         resposta.setDados(categoriasDTO);
@@ -68,7 +68,7 @@ public class CategoriaController {
         Categoria categoria = categoriaService.buscaPor(id);
 
         Resposta<CategoriaDTO> resposta = new Resposta<>();
-        resposta.setDados(new CategoriaDTO().comDadosDe(categoria));
+        resposta.setDados(new CategoriaDTO(categoria ) );
 
         return resposta;
     }
@@ -98,7 +98,7 @@ public class CategoriaController {
         }
 
         Categoria categoriaAtualizada = categoriaService.atualiza(id, categoria);
-        resposta.setDados(new CategoriaDTO().comDadosDe(categoriaAtualizada ));
+        resposta.setDados(new CategoriaDTO(categoriaAtualizada ));
 
         return ResponseEntity.ok(resposta);
 

@@ -19,6 +19,12 @@ public class CategoriaDTO {
 
     private DTO<Categoria, CategoriaDTO> dto = new DTO<>(this);
 
+    public CategoriaDTO() {  }
+
+    public CategoriaDTO(Categoria categoria) {
+        this.comDadosDe(categoria );
+    }
+
     public Integer getId() {
         return id;
     }

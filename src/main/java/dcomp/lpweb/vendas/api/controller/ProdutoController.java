@@ -15,9 +15,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/produtos")
@@ -37,16 +37,11 @@ public class ProdutoController {
     @GetMapping
     public Resposta<List<ProdutoDTO>> buscaTodos() {
 
-        System.out.println("Paginação -> " + quantidadePorPagina );
-
         List<Produto> produtos = produtoService.todos();
 
-        ArrayList<ProdutoDTO> produtosDTO = new ArrayList<>(produtos.size());
-
-        produtos.forEach(p -> {
-            ProdutoDTO produtoDTO = new ProdutoDTO().comDadosDe(p);
-            produtosDTO.add(produtoDTO);
-        });
+        List<ProdutoDTO> produtosDTO = produtos.stream()
+                              .map(p -> new ProdutoDTO(p))
+                              .collect(Collectors.toList());
 
         Resposta<List<ProdutoDTO>> resposta = new Resposta<>();
         resposta.setDados(produtosDTO );
@@ -79,7 +74,7 @@ public class ProdutoController {
         Produto produto = produtoService.buscaPor(id);
 
         Resposta<ProdutoDTO> resposta = new Resposta<>();
-        resposta.setDados(new ProdutoDTO().comDadosDe(produto ) );
+        resposta.setDados(new ProdutoDTO(produto) );
 
         return resposta;
     }
@@ -88,7 +83,6 @@ public class ProdutoController {
     public ResponseEntity<Resposta<ProdutoDTO>> atualiza(@PathVariable Integer id, @RequestBody ProdutoDTO produtoDTO) {
 
         Produto produto = produtoDTO.atualizaIgnorandoNulo(produtoService.buscaPor(id ) );
-
         Resposta<ProdutoDTO> resposta = new Resposta<>();
 
         Validacao<ProdutoDTO> validacao = new Validacao<>();
@@ -100,7 +94,7 @@ public class ProdutoController {
         }
 
         Produto produtoAtualizado = produtoService.atualiza(id, produto);
-        resposta.setDados(new ProdutoDTO().comDadosDe(produtoAtualizado) );
+        resposta.setDados(new ProdutoDTO(produtoAtualizado ));
 
         return ResponseEntity.ok(resposta );
     }
@@ -109,6 +103,6 @@ public class ProdutoController {
     @PutMapping("/{id}/ativo")
     public ProdutoDTO atualiza(@PathVariable Integer id, @RequestBody Boolean ativo) {
         Produto produtoSalvo = produtoService.atualizaPropriedadeAtivo(id, ativo);
-        return new ProdutoDTO().comDadosDe(produtoSalvo );
+        return new ProdutoDTO(produtoSalvo );
     }
 }

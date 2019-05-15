@@ -2,16 +2,18 @@ package dcomp.lpweb.vendas.api.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.model.Produto;
 import dcomp.lpweb.vendas.api.service.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ProdutoDTO {
 
@@ -20,7 +22,7 @@ public class ProdutoDTO {
     @NotEmpty
     private String nome;
 
-    @DecimalMin("0.01")
+    @Positive
     private BigDecimal precoAtual;
 
     private Boolean ativo;
@@ -33,6 +35,11 @@ public class ProdutoDTO {
 
     private DTO<Produto, ProdutoDTO> dto = new DTO<>(this);
 
+    public ProdutoDTO() {  }
+
+    public ProdutoDTO(Produto produto ) {
+        this.comDadosDe(produto );
+    }
 
     public Integer getId() {
         return id;
@@ -85,6 +92,7 @@ public class ProdutoDTO {
     public ProdutoDTO comDadosDe(Produto produto) {
         dto.comDadosDe(produto );
 
+
         if (existeCategoriasEm(produto)) {
             adicionaAsCategoriasDe(produto );
         }
@@ -93,13 +101,26 @@ public class ProdutoDTO {
 
 
     public Produto atualizaIgnorandoNulo(Produto produto) {
-        Produto p = dto.mergeIgnorandoNulo(produto );
+
+        produto = dto.mergeIgnorandoNulo(produto);
+
+        Set<Categoria> categorias = this.getCategoriasDTO()
+                .stream()
+                .map(dto -> dto.getCategoria())
+                .collect(Collectors.toSet());
+
+        produto.setCategorias(categorias );
+
         return produto;
+
     }
 
-    private void adicionaAsCategoriasDe(Produto produto) {
-        produto.getCategorias()
-                .forEach(cat -> this.categoriasDTO.add(new CategoriaDTO().comDadosDe(cat)) );
+    private void adicionaAsCategoriasDe(final Produto produto) {
+
+        categoriasDTO = produto.getCategorias()
+                               .stream()
+                               .map(categoria -> new CategoriaDTO(categoria))
+                               .collect(Collectors.toSet());
     }
 
     private boolean existeCategoriasEm(Produto produto) {

@@ -44,10 +44,7 @@ public class ProdutoService {
     public Produto salva(Produto produto) {
         // TODO Melhorar o código de validaCategorias()
         validaCategorias( produto.getCategorias() );
-        Produto produtosSalvo = genericoService.salva(produto);
-
-
-        return produtosSalvo;
+        return genericoService.salva(produto);
     }
 
 
@@ -61,10 +58,12 @@ public class ProdutoService {
 
     @Transactional
     public Produto atualiza(Integer id, Produto produto) {
-       return genericoService.atualiza(produto, id );
-
+        System.out.println("11111111111 " + produto );
+        validaCategorias( produto.getCategorias() );
+        return genericoService.atualiza(produto, id );
     }
 
+    @Transactional(readOnly = true)
     public Produto buscaPor(Integer id) {
         return genericoService.buscaPor(id );
     }
