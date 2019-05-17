@@ -47,4 +47,8 @@ public class CategoriaService {
     public Categoria atualiza(Integer id, Categoria categoria) {
         return  genericoService.atualiza(categoria, id );
     }
+
+    public List<Categoria> buscaCategorias(List<Integer> idsCategorias) {
+        return categoriaRepository.findAllById(idsCategorias );
+    }
 }

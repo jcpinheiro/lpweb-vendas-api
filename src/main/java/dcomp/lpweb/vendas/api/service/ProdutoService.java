@@ -5,6 +5,8 @@ import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.model.Produto;
 import dcomp.lpweb.vendas.api.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,6 +81,18 @@ public class ProdutoService {
         Objects.requireNonNull(c, "A categoria não pode ser nula");
         Integer id = Objects.requireNonNull(c.getId(), "O id da categoria não pode ser nulo");
         c = categoriaService.buscaPor(id );
+    }
+
+    public Page<Produto> buscaPaginada(Pageable page) {
+       return produtoRepository.findAll(page );
+    }
+
+    public Page<Produto> busca(String nome, List<Integer> idsCategorias, Pageable page) {
+        //TODO Adicinonar este método no Serviço Genérico
+        List<Categoria> categorias = categoriaService.buscaCategorias(idsCategorias);
+
+//        return produtoRepository.busca(nome, categorias, page );
+        return produtoRepository.findDistinctByNomeContainingAndCategoriasIn(nome, categorias, page );
     }
 }
 

@@ -9,12 +9,17 @@ import dcomp.lpweb.vendas.api.model.Produto;
 import dcomp.lpweb.vendas.api.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -49,6 +54,54 @@ public class ProdutoController {
         return resposta;
     }
 
+
+    @GetMapping("/paginacao")
+    public Resposta<Page<ProdutoDTO>> buscaPaginada(
+            @RequestParam(defaultValue = "0") Integer pagina,
+            @RequestParam(defaultValue = "3")Integer tamanho,
+            @RequestParam(defaultValue = "nome")String orderBy,
+            @RequestParam(defaultValue = "ASC")String direcao
+    ) {
+
+        final Pageable page = PageRequest.of(pagina, tamanho, Sort.Direction.valueOf(direcao), orderBy);
+
+        Page<Produto> produtos = produtoService.buscaPaginada(page );
+        Page<ProdutoDTO> produtosDTO = produtos
+                                      .map(p -> new ProdutoDTO(p) );
+
+        Resposta<Page<ProdutoDTO>> resposta = new Resposta<>();
+        resposta.setDados(produtosDTO );
+
+        return resposta;
+    }
+
+    @GetMapping("/busca")
+    public Resposta<Page<ProdutoDTO>> busca(
+            @RequestParam(defaultValue = "") String nome,
+            @RequestParam(defaultValue = "") String categorias,
+            @RequestParam(defaultValue = "0") Integer pagina,
+            @RequestParam(defaultValue = "3")Integer tamanho,
+            @RequestParam(defaultValue = "nome")String orderBy,
+            @RequestParam(defaultValue = "ASC")String direcao
+    ) {
+
+        final List<Integer> idsCategorias = Arrays.asList(categorias.split(",")).stream()
+                .map(s -> Integer.valueOf(s))
+                .collect(Collectors.toList());
+
+
+        final Pageable page = PageRequest.of(pagina, tamanho, Sort.Direction.valueOf(direcao), orderBy);
+
+        Page<Produto> produtos = produtoService.busca(nome, idsCategorias, page );
+
+        Page<ProdutoDTO> produtosDTO = produtos
+                .map(p -> new ProdutoDTO(p) );
+
+        Resposta<Page<ProdutoDTO>> resposta = new Resposta<>();
+        resposta.setDados(produtosDTO );
+
+        return resposta;
+    }
 
     @PostMapping
     public ResponseEntity<Resposta<ProdutoDTO>> salva(@Valid @RequestBody ProdutoDTO produtoDTO )  {
