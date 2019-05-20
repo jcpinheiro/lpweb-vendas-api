@@ -1,17 +1,20 @@
 package dcomp.lpweb.vendas.api.controller;
 
 import dcomp.lpweb.vendas.api.controller.dto.CategoriaDTO;
+import dcomp.lpweb.vendas.api.controller.event.HeaderLocationEvento;
 import dcomp.lpweb.vendas.api.controller.response.Erro;
 import dcomp.lpweb.vendas.api.controller.response.Resposta;
 import dcomp.lpweb.vendas.api.controller.validation.Validacao;
 import dcomp.lpweb.vendas.api.model.Categoria;
 import dcomp.lpweb.vendas.api.service.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
@@ -25,6 +28,9 @@ public class CategoriaController {
     private final CategoriaService categoriaService;
 
     @Autowired
+    private ApplicationEventPublisher publisher;
+
+    @Autowired
     public CategoriaController(CategoriaService categoriaService) {
         this.categoriaService = categoriaService;
     }
@@ -33,8 +39,8 @@ public class CategoriaController {
     public Resposta<List<CategoriaDTO>> todas() {
 
         List<Categoria> categorias = categoriaService.todas();
-        List<CategoriaDTO> categoriasDTO = new ArrayList<>(categorias.size());
 
+        List<CategoriaDTO> categoriasDTO = new ArrayList<>(categorias.size());
         categorias.forEach(categoria -> categoriasDTO.add(new CategoriaDTO(categoria) ));
 
         Resposta<List<CategoriaDTO>> resposta = new Resposta<>();
@@ -45,21 +51,19 @@ public class CategoriaController {
 
 
     @PostMapping
-    public ResponseEntity<Resposta<CategoriaDTO>> salva(@Valid @RequestBody CategoriaDTO categoriaDTO) {
+    public ResponseEntity<Resposta<CategoriaDTO>> salva(@Valid @RequestBody CategoriaDTO categoriaDTO,
+                                                        HttpServletResponse response) {
 
 
         Categoria categoriaSalva = categoriaService.salva(categoriaDTO.getCategoria());
 
-        URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequestUri()
-                .path("/{id}")
-                .buildAndExpand(categoriaSalva.getId())
-                .toUri();
+        publisher.publishEvent(new HeaderLocationEvento(this, response, categoriaSalva.getId()) );
 
         Resposta<CategoriaDTO> resposta = new Resposta<>();
-        resposta.setDados(categoriaDTO.comDadosDe(categoriaSalva));
+        resposta.setDados(categoriaDTO.comDadosDe(categoriaSalva) );
 
-        return ResponseEntity.created(uri).body(resposta);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                             .body(resposta);
     }
 
     @GetMapping("/{id}")

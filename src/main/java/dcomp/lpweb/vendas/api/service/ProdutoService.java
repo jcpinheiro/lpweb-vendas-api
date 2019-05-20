@@ -60,7 +60,6 @@ public class ProdutoService {
 
     @Transactional
     public Produto atualiza(Integer id, Produto produto) {
-        System.out.println("11111111111 " + produto );
         validaCategorias( produto.getCategorias() );
         return genericoService.atualiza(produto, id );
     }

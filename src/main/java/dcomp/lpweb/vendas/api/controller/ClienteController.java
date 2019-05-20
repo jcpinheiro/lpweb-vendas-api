@@ -1,6 +1,7 @@
 package dcomp.lpweb.vendas.api.controller;
 
 
+import dcomp.lpweb.vendas.api.controller.event.HeaderLocationEvento;
 import dcomp.lpweb.vendas.api.model.Cliente;
 import dcomp.lpweb.vendas.api.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +40,10 @@ public class ClienteController {
     public ResponseEntity<?> cria(@Validated @RequestBody Cliente cliente, HttpServletResponse response) {
         Cliente clienteSalvo = clienteService.salva(cliente );
 
-        URI uri = ServletUriComponentsBuilder
-               .fromCurrentRequestUri()
-               .path("/{id}")
-               .buildAndExpand(clienteSalvo.getId())
-               .toUri();
+        publisher.publishEvent(new HeaderLocationEvento(this, response, clienteSalvo.getId()) );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(clienteSalvo );
+        return ResponseEntity.status(HttpStatus.CREATED)
+                             .body(clienteSalvo );
     }
 
     @GetMapping("/{id}")
