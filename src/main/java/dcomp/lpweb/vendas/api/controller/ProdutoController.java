@@ -7,6 +7,7 @@ import dcomp.lpweb.vendas.api.controller.response.Erro;
 import dcomp.lpweb.vendas.api.controller.response.Resposta;
 import dcomp.lpweb.vendas.api.controller.validation.Validacao;
 import dcomp.lpweb.vendas.api.model.Produto;
+import dcomp.lpweb.vendas.api.repository.filter.ProdutoFiltro;
 import dcomp.lpweb.vendas.api.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -108,6 +109,23 @@ public class ProdutoController {
 
         return resposta;
     }
+
+
+    @GetMapping("/filtra")
+    public Resposta<List<ProdutoDTO>> filtro(ProdutoFiltro produtoFiltro ) {
+
+        List<Produto> produtos = produtoService.filtra(produtoFiltro );
+
+        List<ProdutoDTO> produtosDTO = produtos.stream()
+                .map(p -> new ProdutoDTO(p))
+                .collect(Collectors.toList());
+
+        Resposta<List<ProdutoDTO>> resposta = new Resposta<>();
+        resposta.setDados(produtosDTO );
+
+        return resposta;
+    }
+
 
     @PostMapping
     public ResponseEntity<Resposta<ProdutoDTO>> salva(@Valid @RequestBody ProdutoDTO produtoDTO,
