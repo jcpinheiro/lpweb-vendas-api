@@ -16,11 +16,8 @@ CREATE TABLE IF NOT EXISTS endereco (
   cidade VARCHAR(100) NOT NULL,
   uf CHAR(2) NULL,
   cliente_id INT NOT NULL,
-  PRIMARY KEY (id, logradouro, numero),
-  INDEX fk_endereco_cliente_idx (cliente_id ASC),
-  CONSTRAINT fk_endereco_cliente
-    FOREIGN KEY (cliente_id)
-    REFERENCES cliente (id)
+  PRIMARY KEY (id),
+    CONSTRAINT fk_endereco_cliente FOREIGN KEY (cliente_id) REFERENCES cliente (id)
 )engine=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO cliente (nome, email, cpf, tipo) VALUES ('Fulano da Silva', 'fulano@email.com', '73543374559', 'FISICA');
