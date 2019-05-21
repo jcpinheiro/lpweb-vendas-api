@@ -49,19 +49,52 @@ public class ProdutoRepositoryImpl implements ProdutoRepositoryQuery {
     }
 
 
+
+    // --------------------------- Com paginação -----------------------------------------
+
+    @Override
+    public Page<Produto> filtrar(ProdutoFiltro filtro, Pageable pageable) {
+
+        // Usamos o CriteriaBuilder(cb) para criar a CriteriaQueyr (cQuery)
+        // com a tipagem do tipo a ser selecionado (Produto)
+        CriteriaBuilder cBuilder = manager.getCriteriaBuilder();
+
+
+        // 1. Select p From Produto p
+        CriteriaQuery<Produto> cQuery = cBuilder.createQuery(Produto.class );
+
+        // 2. clausula from e joins
+        Root<Produto> produtoRoot = cQuery.from(Produto.class );
+
+        // 3. adiciona as restrições (os predicados) que serão passadas na clausula where
+        Predicate[] restricoes = this.criaRestricoes(filtro, cBuilder, produtoRoot  );
+
+
+        // 4. monta a consulta com as restrições de paginação
+        cQuery.select(produtoRoot)
+              .where(restricoes )
+              .orderBy( cBuilder.asc(produtoRoot.get("nome")) );
+
+        TypedQuery<Produto> query = manager.createQuery(cQuery);
+        adicionaRestricoesDePaginacao(query, pageable);
+
+        return new PageImpl<>(query.getResultList(), pageable, total(filtro) );
+    }
+
+
     private Predicate[] criaRestricoes(ProdutoFiltro filtro, CriteriaBuilder cBuilder, Root<Produto> produtoRoot) {
 
         List<Predicate> predicates = new ArrayList<>();
 
         if ( !StringUtils.isEmpty( filtro.getNome()) ) {
-           // where nome like %Computador%
-           predicates.add(cBuilder.like(cBuilder.lower(produtoRoot.get("nome")), "%" + filtro.getNome().toLowerCase() + "%" ) );
+            // where nome like %Computador%
+            predicates.add(cBuilder.like(cBuilder.lower(produtoRoot.get("nome")), "%" + filtro.getNome().toLowerCase() + "%" ) );
 
         }
 
         if ( Objects.nonNull(filtro.getPrecoDe()) ) {
             predicates.add( cBuilder.ge( produtoRoot.get("precoAtual"), filtro.getPrecoDe() ));
-       }
+        }
 
         if( Objects.nonNull( filtro.getPrecoAte()  ) ) {
             predicates.add( cBuilder.le( produtoRoot.get("precoAtual"), filtro.getPrecoAte() ));
@@ -70,6 +103,7 @@ public class ProdutoRepositoryImpl implements ProdutoRepositoryQuery {
         if ( Objects.nonNull( filtro.getAtivo()) ) {
             predicates.add( cBuilder.equal( produtoRoot.get("ativo"), filtro.getAtivo() ));
         }
+
         if (Objects.nonNull(filtro.getCategoriaId()) ) {
 
             // antes fazemos o join com categorias
@@ -79,16 +113,36 @@ public class ProdutoRepositoryImpl implements ProdutoRepositoryQuery {
             predicates.add ( cBuilder.equal(categoriaPath, filtro.getCategoriaId() ) );
         }
 
-       return predicates.toArray(new Predicate[ predicates.size() ] );
+        return predicates.toArray(new Predicate[ predicates.size() ] );
     }
 
 
-    // --------------------------- Com paginação -----------------------------------------
 
-    @Override
-    public Page<Produto> filtrar(ProdutoFiltro filtro, Pageable pageable) {
-        return null;
+    private void adicionaRestricoesDePaginacao(TypedQuery<Produto> query, Pageable pageable) {
+        Integer paginaAtual = pageable.getPageNumber();
+        Integer totalObjetosPorPagina = pageable.getPageSize();
+        Integer primeiroObjetoDaPagina = paginaAtual * totalObjetosPorPagina;
+
+        // 0 a n-1, n - (2n -1), ...
+        query.setFirstResult(primeiroObjetoDaPagina );
+        query.setMaxResults(totalObjetosPorPagina );
+
     }
+
+    private Long total(ProdutoFiltro filtro) {
+        CriteriaBuilder cBuilder = manager.getCriteriaBuilder();
+        CriteriaQuery<Long> cQuery = cBuilder.createQuery(Long.class);
+
+        Root<Produto> rootProduto = cQuery.from(Produto.class);
+
+        Predicate[] predicates = criaRestricoes(filtro, cBuilder, rootProduto);
+
+        cQuery.where(predicates );
+        cQuery.select( cBuilder.count(rootProduto) );
+
+        return manager.createQuery(cQuery).getSingleResult();
+    }
+
 
 
 }

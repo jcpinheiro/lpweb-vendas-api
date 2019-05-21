@@ -8,14 +8,12 @@ import dcomp.lpweb.vendas.api.controller.response.Resposta;
 import dcomp.lpweb.vendas.api.controller.validation.Validacao;
 import dcomp.lpweb.vendas.api.model.Produto;
 import dcomp.lpweb.vendas.api.repository.filter.ProdutoFiltro;
+import dcomp.lpweb.vendas.api.service.CategoriaService;
 import dcomp.lpweb.vendas.api.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +33,9 @@ public class ProdutoController {
     private Integer quantidadePorPagina;
 
     private final ProdutoService produtoService;
+
+    @Autowired
+    private CategoriaService categoriaService;
 
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -126,6 +127,25 @@ public class ProdutoController {
         return resposta;
     }
 
+
+    @GetMapping("/filtra/paginacao")
+    public Resposta<Page<ProdutoDTO>> buscaPaginada(ProdutoFiltro filtro,
+                  @RequestParam(defaultValue = "0") Integer pagina,
+                  @RequestParam(defaultValue = "3")Integer tamanho,
+                  @RequestParam(defaultValue = "nome") String orderBy,
+                  @RequestParam(defaultValue = "ASC") String direcao ) {
+
+        final Pageable page = PageRequest.of(pagina, tamanho, Sort.Direction.valueOf(direcao), orderBy);
+
+        Page<Produto> produtos = produtoService.busca(filtro, page );
+
+        Page<ProdutoDTO> produtosDTO = produtos.map( p -> new ProdutoDTO(p) );
+
+        Resposta<Page<ProdutoDTO>> resposta = new Resposta<>();
+        resposta.setDados(produtosDTO );
+
+        return resposta;
+    }
 
     @PostMapping
     public ResponseEntity<Resposta<ProdutoDTO>> salva(@Valid @RequestBody ProdutoDTO produtoDTO,

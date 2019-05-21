@@ -50,4 +50,15 @@ public class ProdutoFiltro {
     public void setCategoriaId(Integer categoriaId) {
         this.categoriaId = categoriaId;
     }
+
+    @Override
+    public String toString() {
+        return "ProdutoFiltro{" +
+                "nome='" + nome + '\'' +
+                ", precoDe=" + precoDe +
+                ", precoAte=" + precoAte +
+                ", ativo=" + ativo +
+                ", categoriaId=" + categoriaId +
+                '}';
+    }
 }
