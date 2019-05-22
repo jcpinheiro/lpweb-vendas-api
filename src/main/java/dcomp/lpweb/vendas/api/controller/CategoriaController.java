@@ -12,14 +12,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/categorias")
@@ -37,44 +36,30 @@ public class CategoriaController {
 
     @GetMapping
     public Resposta<List<CategoriaDTO>> todas() {
+        List<CategoriaDTO> categoriasDTO = categoriaService.todas()
+                                   .stream()
+                                   .map(categoria -> new CategoriaDTO(categoria))
+                                   .collect(Collectors.toList());
 
-        List<Categoria> categorias = categoriaService.todas();
-
-        List<CategoriaDTO> categoriasDTO = new ArrayList<>(categorias.size());
-        categorias.forEach(categoria -> categoriasDTO.add(new CategoriaDTO(categoria) ));
-
-        Resposta<List<CategoriaDTO>> resposta = new Resposta<>();
-        resposta.setDados(categoriasDTO);
-
-        return resposta;
+        return Resposta.comDadosDe(categoriasDTO);
     }
 
 
     @PostMapping
     public ResponseEntity<Resposta<CategoriaDTO>> salva(@Valid @RequestBody CategoriaDTO categoriaDTO,
                                                         HttpServletResponse response) {
-
-
         Categoria categoriaSalva = categoriaService.salva(categoriaDTO.getCategoria());
 
         publisher.publishEvent(new HeaderLocationEvento(this, response, categoriaSalva.getId()) );
 
-        Resposta<CategoriaDTO> resposta = new Resposta<>();
-        resposta.setDados(categoriaDTO.comDadosDe(categoriaSalva) );
-
         return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(resposta);
+                             .body(Resposta.comDadosDe(new CategoriaDTO(categoriaSalva)));
     }
 
     @GetMapping("/{id}")
     public Resposta<CategoriaDTO> buscaPor(@PathVariable Integer id) {
-
         Categoria categoria = categoriaService.buscaPor(id);
-
-        Resposta<CategoriaDTO> resposta = new Resposta<>();
-        resposta.setDados(new CategoriaDTO(categoria ) );
-
-        return resposta;
+        return Resposta.comDadosDe(new CategoriaDTO(categoria ));
     }
 
 
@@ -91,20 +76,21 @@ public class CategoriaController {
 
         Categoria categoria = categoriaDTO.atualizaIgnorandoNuloA(categoriaService.buscaPor(id));
 
-        Resposta<CategoriaDTO> resposta = new Resposta<>();
-
-        Validacao<CategoriaDTO> validacao = new Validacao<>();
-        List<Erro> erros =  validacao.valida(categoriaDTO.comDadosDe(categoria) );
-
-        if (Objects.nonNull( erros ) &&  !erros.isEmpty() ) {
-            resposta.setErros(erros );
-            return ResponseEntity.badRequest().body(resposta );
+        List<Erro> erros = this.getErros(new CategoriaDTO(categoria) );
+        if (existe(erros)) {
+            return ResponseEntity.badRequest().body(Resposta.com(erros) );
         }
 
         Categoria categoriaAtualizada = categoriaService.atualiza(id, categoria);
-        resposta.setDados(new CategoriaDTO(categoriaAtualizada ));
+        return ResponseEntity.ok(Resposta.comDadosDe(new CategoriaDTO(categoriaAtualizada )));
+    }
 
-        return ResponseEntity.ok(resposta);
+    private boolean existe(List<Erro> erros) {
+        return Objects.nonNull( erros ) &&  !erros.isEmpty();
+    }
 
+    private List<Erro> getErros(CategoriaDTO dto) {
+        Validacao<CategoriaDTO> validacao = new Validacao<>();
+        return validacao.valida(dto);
     }
 }

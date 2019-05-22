@@ -20,38 +20,6 @@ public class ProdutoRepositoryImpl implements ProdutoRepositoryQuery {
     @PersistenceContext
     private EntityManager manager;
 
-
-    @Override
-    public List<Produto> filtrar(ProdutoFiltro filtro) {
-
-
-        // Usamos o CriteriaBuilder(cb) para criar a CriteriaQueyr (cq)
-        // com a tipagem do tipo a ser selecionado (Produto)
-        CriteriaBuilder cb = manager.getCriteriaBuilder();
-
-        // 1. Select p From Produto p
-        CriteriaQuery<Produto> cq = cb.createQuery(Produto.class );
-
-        // 2. clausula from e joins
-        Root<Produto> produtoRoot = cq.from(Produto.class );
-
-        // 3. adiciona as restrições (os predicados) que serão passadas na clausula where
-        Predicate[] restricoes = this.criaRestricoes(filtro, cb, produtoRoot  );
-
-        // 4. monta a consulta com as restrições
-        cq.select(produtoRoot )
-          .where(restricoes )
-          .orderBy( cb.asc(produtoRoot.get("nome")) );
-
-
-        // 5. cria e executa a consula
-        return manager.createQuery(cq).getResultList();
-    }
-
-
-
-    // --------------------------- Com paginação -----------------------------------------
-
     @Override
     public Page<Produto> filtrar(ProdutoFiltro filtro, Pageable pageable) {
 
@@ -70,15 +38,16 @@ public class ProdutoRepositoryImpl implements ProdutoRepositoryQuery {
         Predicate[] restricoes = this.criaRestricoes(filtro, cBuilder, produtoRoot  );
 
 
-        // 4. monta a consulta com as restrições de paginação
+        // 4. monta a consulta com as restrições
         cQuery.select(produtoRoot)
               .where(restricoes )
-              .orderBy( cBuilder.asc(produtoRoot.get("nome")) );
+              .orderBy( cBuilder.desc(produtoRoot.get("nome")) );
 
+        // 5. cria e executa a consula
         TypedQuery<Produto> query = manager.createQuery(cQuery);
         adicionaRestricoesDePaginacao(query, pageable);
 
-        return new PageImpl<>(query.getResultList(), pageable, total(filtro) );
+        return new PageImpl<Produto>(query.getResultList(), pageable, total(filtro) );
     }
 
 

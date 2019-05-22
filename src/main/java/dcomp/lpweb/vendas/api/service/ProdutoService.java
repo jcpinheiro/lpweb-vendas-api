@@ -6,11 +6,9 @@ import dcomp.lpweb.vendas.api.model.Produto;
 import dcomp.lpweb.vendas.api.repository.ProdutoRepository;
 import dcomp.lpweb.vendas.api.repository.filter.ProdutoFiltro;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -94,11 +92,8 @@ public class ProdutoService {
         List<Categoria> categorias = categoriaService.buscaCategorias(idsCategorias);
 
 //        return produtoRepository.busca(nome, categorias, page );
-        return produtoRepository.findDistinctByNomeContainingAndCategoriasIn(nome, categorias, page );
-    }
 
-    public List<Produto> filtra(ProdutoFiltro filtro) {
-        return produtoRepository.filtrar(filtro );
+        return produtoRepository.findDistinctByNomeContainingAndCategoriasIn(nome, categorias, page );
     }
 
     public Page<Produto> busca(ProdutoFiltro filtro, Pageable pageable) {

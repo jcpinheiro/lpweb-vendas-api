@@ -37,7 +37,7 @@ public class ClienteController {
 
 
    @PostMapping
-    public ResponseEntity<?> cria(@Validated @RequestBody Cliente cliente, HttpServletResponse response) {
+    public ResponseEntity<Cliente> cria(@Validated @RequestBody Cliente cliente, HttpServletResponse response) {
         Cliente clienteSalvo = clienteService.salva(cliente );
 
         publisher.publishEvent(new HeaderLocationEvento(this, response, clienteSalvo.getId()) );
