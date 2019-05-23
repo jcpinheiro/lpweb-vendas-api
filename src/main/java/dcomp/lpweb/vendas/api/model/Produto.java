@@ -2,6 +2,9 @@ package dcomp.lpweb.vendas.api.model;
 
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -18,6 +21,12 @@ public class Produto {
     private BigDecimal precoAtual;
 
     private Boolean ativo;
+
+    @NotNull
+    @Min(0)
+    @Column(name = "quantidade_estoque")
+    private Integer quantidadeEstoque;
+
 
     @ManyToMany
     @JoinTable(name = "produto_categoria",
@@ -67,6 +76,30 @@ public class Produto {
 
     public void adiciona(Categoria categoria ) {
         categorias.add(categoria );
+    }
+
+    public Integer getQuantidadeEstoque() {
+        return quantidadeEstoque;
+    }
+
+    private void setQuantidadeEstoque(Integer quantidadeEstoque) {
+        this.quantidadeEstoque = quantidadeEstoque;
+    }
+
+    public void baixaEstoque(@Positive Integer quantidade)  {
+        final int novaQuantidade = this.getQuantidadeEstoque() - quantidade;
+
+        if (novaQuantidade < 0) {
+            throw new IllegalArgumentException
+                    ("Não há disponibilidade no estoque de "
+                            + quantidade + " itens do produto " + this.getNome() + "."
+                            + "Temos disponível apenas " + this.quantidadeEstoque + "Itens" );
+        }
+        this.setQuantidadeEstoque(novaQuantidade );
+    }
+
+    public void adicionaEstoque(@Min(1) Integer quantidade) {
+        this.setQuantidadeEstoque(this.getQuantidadeEstoque() + quantidade);
     }
 
 

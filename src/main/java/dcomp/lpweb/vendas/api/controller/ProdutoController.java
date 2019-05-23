@@ -90,7 +90,7 @@ public class ProdutoController {
         return ResponseEntity.ok(Resposta.comDadosDe(new ProdutoDTO(produtoAtualizado )) );
     }
 
-
+    //TODO generalizar este código, está duplicado nos outros controllers
     private boolean existe(List<Erro> erros) {
         return Objects.nonNull( erros ) &&  !erros.isEmpty();
     }

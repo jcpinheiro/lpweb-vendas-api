@@ -16,12 +16,4 @@ import java.util.List;
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Integer>, ProdutoRepositoryQuery {
 
-/*
-    @Query("SELECT DISTINCT p FROM Produto p INNER JOIN p.categorias c WHERE p.nome LIKE %:nome% AND c IN (:categorias)")
-    Page<Produto> busca(@Param("nome") String nome, @Param("categorias") List<Categoria> categorias, Pageable page);
-*/
-
-
-    Page<Produto> findDistinctByNomeContainingAndCategoriasIn (String nome, List<Categoria> categorias, Pageable page);
-
 }

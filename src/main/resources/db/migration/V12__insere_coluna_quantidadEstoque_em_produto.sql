@@ -1,0 +1,1 @@
+ALTER TABLE produto ADD COLUMN quantidade_estoque INT NULL AFTER ativo;

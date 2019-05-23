@@ -49,7 +49,6 @@ public class ProdutoService {
         return genericoService.salva(produto);
     }
 
-
     @Transactional
     public Produto atualizaPropriedadeAtivo(Integer id, Boolean ativo) {
         Produto produto = this.buscaPorId(id);
@@ -69,8 +68,13 @@ public class ProdutoService {
         return genericoService.buscaPor(id );
     }
 
-    private void validaCategorias(Set<Categoria> categorias) {
+    @Transactional(readOnly = true)
+    public Page<Produto> busca(ProdutoFiltro filtro, Pageable pageable) {
+        return produtoRepository.filtrar(filtro, pageable );
+    }
 
+
+    private void validaCategorias(Set<Categoria> categorias) {
         if (categorias !=null && !categorias.isEmpty() )
             categorias.forEach(this::accept);
     }
@@ -82,23 +86,6 @@ public class ProdutoService {
         c = categoriaService.buscaPor(id );
     }
 
-    public Page<Produto> buscaPaginada(Pageable page) {
-       return produtoRepository.findAll(page );
-    }
-
-    public Page<Produto> busca(String nome, List<Integer> idsCategorias, Pageable page) {
-
-        //TODO Adicinonar este método no Serviço Genérico
-        List<Categoria> categorias = categoriaService.buscaCategorias(idsCategorias);
-
-//        return produtoRepository.busca(nome, categorias, page );
-
-        return produtoRepository.findDistinctByNomeContainingAndCategoriasIn(nome, categorias, page );
-    }
-
-    public Page<Produto> busca(ProdutoFiltro filtro, Pageable pageable) {
-        return produtoRepository.filtrar(filtro, pageable );
-    }
 }
 
 
