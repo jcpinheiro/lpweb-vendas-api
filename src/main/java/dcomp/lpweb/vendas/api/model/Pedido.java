@@ -27,7 +27,6 @@ public class Pedido {
     @Column(columnDefinition = "text")
     private String observacoes;
 
-
     @DecimalMin(value = "0.00")
     @Column(name = "valor_desconto")
     private BigDecimal valorDesconto = BigDecimal.ZERO;
@@ -54,6 +53,20 @@ public class Pedido {
     @PrePersist
     private void prePersist() {
         this.instanteCriacao = LocalDateTime.now();
+    }
+
+    public BigDecimal getTotal() {
+       //Vamos usar o método add() da classe BigDecimal
+/*
+       return itens.stream()
+              .map(item -> item.getSubTotal())
+              .reduce(BigDecimal.ZERO, (x, y) -> x.add(y));
+*/
+
+       // Soluçao mais enxuta
+       return itens.stream()
+                    .map(ItemPedido::getSubTotal)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public Set<ItemPedido> getItens() {
